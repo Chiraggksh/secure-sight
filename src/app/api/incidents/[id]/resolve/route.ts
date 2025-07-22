@@ -4,18 +4,17 @@ import { PrismaClient } from '@prisma/client';
 
 const prisma = new PrismaClient();
 
-export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(
+  req: NextRequest,
+  { params }: { params: { id: string } } // ✅ Correct inline type
+) {
   const { id } = params;
 
-  try {
-    const incident = await prisma.incident.update({
-      where: { id },
-      data: { resolved: true },
-      include: { camera: true },
-    });
+  const incident = await prisma.incident.update({
+    where: { id: Number(id) }, // ✅ Convert string to number
+    data: { resolved: true },
+    include: { camera: true },
+  });
 
-    return NextResponse.json(incident);
-  } catch (error) {
-    return NextResponse.json({ error: 'Incident not found or update failed.' }, { status: 500 });
-  }
+  return NextResponse.json(incident);
 }
